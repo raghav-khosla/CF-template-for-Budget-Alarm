@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation template to create a budget alarm.
+
+Parameters: 
+  AmountParameter:
+    Type: String
+    Description: Amount Budgeted
+  UnitParameter:
+    Type: String
+    Description: Enter the Currency
+  TimeUnitParameter:
+    Type: String
+    Description: Enter the Budget Receiving Frequency
+  StartParameter: 
+    Type: String
+    Description: Enter the Start Date
+  EndParameter: 
+    Type: String
+    Description: Enter the End Date
+  ThresholdAlarmParameter:
+    Type: Number
+    Description: Enter the Alarm Threshold
+  EvaluationPeriodsParameter:
+    Type: Number
+    Description: Enter the Evaluation Periods
+    MinValue: 1
+  ThresholdNotificationParameter:
+    Type: Number
+    Description: Enter the Threshold Value for Notifications
+
+Resources:
+  BudgetAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties: 
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: !Ref ThresholdAlarmParameter
+      AlarmName: BudgetAlarm
+      MetricName: EstimatedCharges
+      Period: 3600
+      Namespace: Billing
+      EvaluationPeriods: !Ref EvaluationPeriodsParameter
+      
+  Budget:
+    Type: AWS::Budgets::Budget
+    Properties:
+      Budget:
+        BudgetLimit:
+          Amount: !Ref AmountParameter
+          Unit: !Ref UnitParameter
+        TimeUnit: !Ref TimeUnitParameter
+        TimePeriod:
+          Start: !Ref  StartParameter
+          End: !Ref EndParameter
+        BudgetType: COST
+
+      NotificationsWithSubscribers:
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: !Ref  ThresholdNotificationParameter
+          Subscribers:
+          - SubscriptionType: EMAIL
+            Address: devops@sourcefuse.com     
+  
+           
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
